@@ -46,7 +46,7 @@ def _make_packet(counter: int, t: float) -> TelemetryPacket:
     elif t < _FLIGHT_START_DELAY + 90:
         frac = (t - _FLIGHT_START_DELAY - 35) / 55
         state = FlightState.DROGUE_DESCENT
-        alt = 3000 * (1 - frac)
+        alt = 3000 * (1 - frac * 35 / 55)
         vel = -55.0
     elif t < _FLIGHT_START_DELAY + 180:
         frac = (t - _FLIGHT_START_DELAY - 90) / 90

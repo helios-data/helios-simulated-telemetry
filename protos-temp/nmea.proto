@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package helios.transport;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "/transport";
+
+/*
+ * NmeaSentence Message
+ *
+ * Represents a single decoded NMEA 0183 sentence received from a GNSS receiver.
+ */
+message NmeaSentence {
+    string talker_id = 1;                              // Talker identifier (e.g., "GP" for GPS, "GN" for multi-constellation)
+    string sentence_type = 2;                          // Sentence formatter (e.g., "GGA", "RMC", "VTG")
+    optional google.protobuf.Timestamp timestamp = 3;  // Parsed sentence timestamp (UTC time from GGA/RMC; date only present on RMC)
+    bool checksum_valid = 4;                           // Whether the trailing *HH checksum matched the computed value
+
+    oneof payload {
+        NmeaPosition position = 5;  // Parsed position fix (from GGA/RMC)
+        string raw_sentence = 6;    // Raw sentence text for unsupported sentence types
+    }
+}
+
+/*
+ * NmeaPosition Message
+ *
+ * Position data decoded from an NMEA position sentence.
+ * Latitude/longitude are in decimal degrees; altitude in meters above MSL.
+ */
+message NmeaPosition {
+    enum FixQuality {
+        INVALID = 0;         // No fix
+        GPS = 1;             // Standard GPS fix
+        DGPS = 2;            // Differential GPS fix
+        PPS = 3;             // Precise Positioning Service fix
+        RTK_FIXED = 4;       // Real Time Kinematic, integers fixed
+        RTK_FLOAT = 5;       // Real Time Kinematic, floating integers
+        ESTIMATED = 6;       // Dead reckoning
+        MANUAL = 7;          // Manual input mode
+        SIMULATION = 8;      // Simulation mode
+    }
+
+    double latitude = 1;                 // Decimal degrees, positive = North
+    double longitude = 2;                // Decimal degrees, positive = East
+    optional float altitude_m = 3;       // Altitude in meters above MSL (from GGA)
+    optional float geoid_separation_m = 4;  // Height of geoid above WGS84 ellipsoid, in meters (from GGA)
+    optional float course_deg = 5;       // Course over ground in degrees true (0–360)
+    optional float speed_knots = 6;      // Speed over ground in knots
+    FixQuality fix_quality = 7;          // Fix quality indicator (from GGA)
+    optional uint32 satellites_used = 8; // Number of satellites used in the fix
+    optional float hdop = 9;             // Horizontal dilution of precision
+}

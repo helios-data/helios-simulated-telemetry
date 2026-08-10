@@ -125,7 +125,7 @@ async def main_loop(args: argparse.Namespace) -> None:
   helios_sdk = HeliosClient(
     core_address="Helios",
     core_port=5000,
-    node_uri="Helios.FALCON.Telemetry",
+    node_uri="Helios.FALCON.SRAD_Telemetry",
   )
 
   # Shared coordination events
@@ -168,7 +168,7 @@ async def main_loop(args: argparse.Namespace) -> None:
           try:
             await helios_sdk.publish_event(
               event_name="telemetry",
-              data=bytes(raw),
+              data=bytes(packet),
             )
           except Exception as e:
             print(f"[Helios] Send failed: {e}", file=sys.stderr)

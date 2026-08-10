@@ -19,6 +19,7 @@ COPY pyproject.toml uv.lock ./
 # Copy the SDK and install dependencies
 COPY helios-python-sdk/ ./helios-python-sdk/
 COPY falcon-protos/ ./falcon-protos/
+COPY protos-temp/ ./protos-temp/
 RUN uv sync --frozen --no-install-project
 
 # Copy source
@@ -28,8 +29,9 @@ COPY src/ ./src/
 RUN mkdir -p src/generated && \
     uv run protoc \
     -I=falcon-protos \
+    -I=protos-temp \
     --python_betterproto2_out=src/generated \
-    $(find falcon-protos -name "*.proto")
+    $(find falcon-protos -name "*.proto") $(find protos-temp -name "*.proto")
 
 RUN uv sync --frozen
 

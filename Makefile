@@ -2,10 +2,11 @@
 
 # Variables
 PROTO_SOURCE_DIR=falcon-protos
+PROTO_TEMP_DIR=protos-temp
 PROTO_BUILD_DIR=src/generated
 
-# Find all .proto files in the proto directory and subdirectories
-PROTO_SRC := $(shell find $(PROTO_SOURCE_DIR) -name "*.proto")
+# Find all .proto files in the proto directories and subdirectories
+PROTO_SRC := $(shell find $(PROTO_SOURCE_DIR) -name "*.proto") $(shell find $(PROTO_TEMP_DIR) -name "*.proto")
 BETTER_PROTO_PLUGIN=$(shell find .venv -name protoc-gen-python_betterproto2\*)
 
 # 1=true, 0=false
@@ -24,6 +25,7 @@ protos:
 	protoc \
     --plugin=protoc-gen-python_betterproto2=$(BETTER_PROTO_PLUGIN) \
     -I=$(PROTO_SOURCE_DIR) \
+    -I=$(PROTO_TEMP_DIR) \
     --python_betterproto2_out=$(PROTO_BUILD_DIR) \
     $(PROTO_SRC)
 

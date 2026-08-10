@@ -18,6 +18,7 @@ import contextlib
 from helios import HeliosClient
 
 from decoder.csv_logger import CsvLogger
+from decoder.events import build_aprs, build_ground_position, build_landing_prediction
 from decoder.formatting import print_compact, print_verbose
 from decoder.packet import decode_packet
 from decoder.simulated_reader import SimulatedReader
@@ -163,13 +164,18 @@ async def main_loop(args: argparse.Namespace) -> None:
         if packet is None:
           continue
 
-        # Helios send: non-blocking
+        # Helios send: non-blocking.  Publish the raw telemetry plus the
+        # higher-level events derived from it.
         if helios_ready.is_set():
+          events = (
+            ("telemetry", bytes(packet)),
+            ("aprs", bytes(build_aprs(packet))),
+            ("ground_position", bytes(build_ground_position(packet))),
+            ("landing_prediction", bytes(build_landing_prediction(packet))),
+          )
           try:
-            await helios_sdk.publish_event(
-              event_name="telemetry",
-              data=bytes(packet),
-            )
+            for event_name, data in events:
+              await helios_sdk.publish_event(event_name=event_name, data=data)
           except Exception as e:
             print(f"[Helios] Send failed: {e}", file=sys.stderr)
             helios_ready.clear()

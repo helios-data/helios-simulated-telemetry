@@ -168,7 +168,7 @@ async def main_loop(args: argparse.Namespace) -> None:
           try:
             await helios_sdk.publish_event(
               event_name="telemetry",
-              data=bytes(raw),
+              data=bytes(packet),
             )
           except Exception as e:
             print(f"[Helios] Send failed: {e}", file=sys.stderr)

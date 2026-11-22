@@ -8,7 +8,7 @@ import crcmod
 from cobs import cobs
 from google.protobuf.message import DecodeError
 
-from generated import TelemetryPacket
+from helios.generated.helios.cots import TelemetryPacket
 from decoder.formatting import hexdump
 
 

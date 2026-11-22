@@ -13,13 +13,17 @@ synthesise plausible versions of three of them directly from a decoded
 
 import math
 
-from generated import FlightState, LandingPoint, LandingPrediction, TelemetryPacket
-from generated.helios.transport import (
-    NmeaPosition,
-    NmeaPositionFixQuality,
-    NmeaSentence,
+from helios.generated.helios.cots import (
+  FlightState, 
+  LandingPoint, 
+  LandingPrediction, 
+  TelemetryPacket,
+  NmeaPosition,
+  NmeaPositionFixQuality,
+  NmeaSentence,
+  AprsPacket, 
+  AprsPosition,
 )
-from helios.generated.helios.transport import AprsPacket, AprsPosition
 
 
 # APRS station identity for the simulated flight computer

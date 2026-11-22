@@ -6,7 +6,7 @@ from typing import Generator
 import crcmod
 from cobs import cobs
 
-from generated import FlightState, TelemetryPacket
+from helios.generated.helios.cots import FlightState, TelemetryPacket, Vec3, Baro
 
 _crc16 = crcmod.predefined.mkCrcFun('kermit')
 _INTERVAL = 0.1  # 10 Hz
@@ -63,20 +63,16 @@ def _make_packet(counter: int, t: float) -> TelemetryPacket:
         counter=counter,
         timestamp_ms=int(t * 1000),
         state=state,
-        accel_x=math.sin(t * 0.3) * 0.5,
-        accel_y=math.cos(t * 0.3) * 0.5,
-        accel_z=accel_z,
-        gyro_x=math.sin(t * 0.1) * 2.0,
-        gyro_y=math.cos(t * 0.1) * 2.0,
-        gyro_z=0.1,
+        accel=Vec3(math.sin(t * 0.3) * 0.5, math.cos(t * 0.3) * 0.5, accel_z),
+        gyro=Vec3(math.sin(t * 0.1) * 2.0, math.cos(t * 0.1) * 2.0, 0.1),
         kf_altitude=alt,
         kf_velocity=vel,
         kf_alt_variance=0.5,
         kf_vel_variance=0.1,
-        baro0_healthy=True,
-        baro1_healthy=True,
-        baro0_altitude=alt + math.sin(t) * 2,
-        baro1_altitude=alt + math.cos(t) * 2,
+        barometers=[
+            Baro(healthy=True, altitude=alt + math.sin(t) * 2),
+            Baro(healthy=True, altitude=alt + math.cos(t) * 2),
+        ],
         ground_altitude=0.0,
         gps_latitude=_LAUNCH_LAT + (_DRIFT_NORTH_MPS * airborne_s) / _METERS_PER_DEG_LAT,
         gps_longitude=_LAUNCH_LON + (_DRIFT_EAST_MPS * airborne_s) / _METERS_PER_DEG_LON,

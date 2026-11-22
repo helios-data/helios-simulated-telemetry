@@ -6,7 +6,7 @@ import csv
 from datetime import datetime
 from pathlib import Path
 
-from generated import TelemetryPacket
+from helios.generated.helios.cots import TelemetryPacket
 from decoder.formatting import flight_state_name
 
 
@@ -49,33 +49,36 @@ COLUMNS = [
 
 def packet_to_row(packet: TelemetryPacket) -> list:
   """Convert a TelemetryPacket to a CSV row aligned with COLUMNS."""
+  assert(packet.accel != None)
+  assert(packet.gyro != None)
+
   return [
     datetime.now().isoformat(timespec='milliseconds'),
     packet.counter,
     packet.timestamp_ms,
     flight_state_name(packet.state),
-    packet.accel_x,
-    packet.accel_y,
-    packet.accel_z,
-    packet.gyro_x,
-    packet.gyro_y,
-    packet.gyro_z,
+    packet.accel.x,
+    packet.accel.y,
+    packet.accel.z,
+    packet.gyro.x,
+    packet.gyro.y,
+    packet.gyro.z,
     packet.kf_altitude,
     packet.kf_velocity,
     packet.kf_alt_variance,
     packet.kf_vel_variance,
-    packet.baro0_healthy,
-    packet.baro1_healthy,
-    packet.baro0_pressure,
-    packet.baro0_temperature,
-    packet.baro0_altitude,
-    packet.baro0_nis,
-    packet.baro0_faults,
-    packet.baro1_pressure,
-    packet.baro1_temperature,
-    packet.baro1_altitude,
-    packet.baro1_nis,
-    packet.baro1_faults,
+    packet.barometers[0].healthy,
+    packet.barometers[0].pressure,
+    packet.barometers[0].temperature,
+    packet.barometers[0].altitude,
+    packet.barometers[0].nis,
+    packet.barometers[0].faults,
+    packet.barometers[1].healthy,
+    packet.barometers[1].pressure,
+    packet.barometers[1].temperature,
+    packet.barometers[1].altitude,
+    packet.barometers[1].nis,
+    packet.barometers[1].faults,
     packet.ground_altitude,
     packet.gps_latitude,
     packet.gps_longitude,
